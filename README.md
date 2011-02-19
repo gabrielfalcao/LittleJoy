@@ -1,6 +1,6 @@
 # LittleJoy
 
-    Really tiny php framework focused on easy-to-write and easy-to-run tests through [phpunit](http://phpunit.de)
+Really tiny php framework focused on easy-to-write and easy-to-run tests through [phpunit](http://phpunit.de)
 
 ## installing
 
