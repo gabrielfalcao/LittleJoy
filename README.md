@@ -7,7 +7,7 @@
 The very first thing you must install is PHPUnit, but since it's
 documentation is quite a bit out-of-date, here is a small walk-through:
 
-    ATTENTION: this walkthrough consider that you have [pear](http://pear.php.net) installed on your computer.
+**ATTENTION**: this walkthrough consider that you have [pear](http://pear.php.net) installed on your computer.
 
 
 1. Add a few channels on your pear
@@ -34,7 +34,7 @@ Within your code, require LittleJoy's bootstrap file:
 
     require_once "Little/Joy.php";
 
-### ORM
+### Active Record
 
 It's inspired on
 [django's model declaration](http://docs.djangoproject.com/en/dev/topics/db/models/),
