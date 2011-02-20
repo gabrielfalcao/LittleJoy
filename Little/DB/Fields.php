@@ -94,6 +94,16 @@ define("nullable", "nullable");
  *
  */
 define("choices", "choices");
+/**
+ * Used to set the name of the classe related with a ForeignKey or ManyToManyField
+ *
+ * Obligatory
+ *
+ * Example:
+ *     array(..., related_with => "Foobar")
+ *
+ */
+define("related_with", "related_with");
 
 
 
@@ -106,6 +116,8 @@ $GLOBALS["__little_joy_field_types__"] = array(
     "ChoiceField" => "varchar",
 
     "AutoField" => "integer",
+    "ForeignKey" => "integer",
+    "ManyToManyField" => "integer",
     "IntegerField" => "integer",
 
     "TextField" => "longtext",
@@ -175,6 +187,9 @@ class URLField extends CharField {}
 class EmailField extends CharField {}
 
 class IntegerField extends Field {}
+class ForeignKey extends IntegerField {}
+class ManyToManyField extends Field {}
+
 class DateTimeField extends Field {}
 class TextField extends Field {}
 

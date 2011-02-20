@@ -55,6 +55,9 @@ class ModelJoy {
         foreach (get_class_vars($klass) as $field_name => $declaration):
             $field = $declaration[type]::from_declaration_array($field_name,
                                                                 $declaration);
+            if ($declaration[type] == ManyToManyField) {
+                continue;
+            }
             $column = $field->as_string();
             array_push($parts, "    `$field_name` $column,");
 
@@ -65,6 +68,63 @@ class ModelJoy {
         $parts[$last_key] = rtrim($parts[$last_key], ",");
 
         array_push($parts, ");");
+
+        foreach (get_class_vars($klass) as $field_name => $declaration):
+            $field = $declaration[type]::from_declaration_array($field_name,
+                                                                $declaration);
+            $field_type = $declaration[type];
+
+            switch($field_type) {
+            case ForeignKey:
+                $related_with = $declaration[related_with];
+                array_push($parts,
+                           "ALTER TABLE `$db_table` ADD CONSTRAINT `".
+                           $klass.
+                           "__related_with__".
+                           $related_with.
+                           "__as__".
+                           $field_name.
+                           "` FOREIGN KEY (`".
+                           $field_name.
+                           "`) REFERENCES `".
+                           $related_with.
+                           "` (`ID`);");
+                break;
+            case ManyToManyField:
+                $related_with = $declaration[related_with];
+                $m2m_name = $related_with.$klass."_M2M";
+
+                array_push($parts,
+                           "CREATE TABLE `$m2m_name`(");
+                array_push($parts,
+                           "    `ID` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,");
+                array_push($parts,
+                           "    `".$related_with."__ID` integer NOT NULL,");
+                array_push($parts,
+                           "    `".$klass."__ID` integer NOT NULL\n);");
+                array_push($parts,
+                           "ALTER TABLE `$m2m_name` ADD CONSTRAINT `".
+                           $related_with.$klass.
+                           "_M2M".
+                           "` FOREIGN KEY (`".
+                           $related_with."__ID`".
+                           ") REFERENCES `".
+                           $related_with.
+                           "` (`ID`);");
+                array_push($parts,
+                           "ALTER TABLE `$m2m_name` ADD CONSTRAINT `".
+                           $klass.$related_with.
+                           "_M2M".
+                           "` FOREIGN KEY (`".
+                           $klass."__ID`".
+                           ") REFERENCES `".
+                           $klass.
+                           "` (`ID`);");
+
+                break;
+            }
+        endforeach;
+
         return implode("\n", $parts);
     }
     public static function syncdb($connection=null){

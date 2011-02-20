@@ -44,6 +44,12 @@ so if you already worked with Django, it will not be a problem.
 
     require_once "Little/Joy.php";
 
+    class School extends ModelJoy {
+        var $name = array(type => CharField, max_length => 100);
+        var $address = array(type => TextField);
+        var $website = array(type => URLField);
+    }
+
     class Person extends ModelJoy {
         var $name = array(type => CharField, max_length => 100);
         var $email = array(type => EmailField);
@@ -51,12 +57,16 @@ so if you already worked with Django, it will not be a problem.
         var $website = array(type => URLField);
         var $gender = array(type => ChoiceField, nullable => true, choices => array("male", "female"));
         var $birthday = array(type => DateTimeField, nullable => true);
+
+        var $mother = array(type => ForeignKey, related_with => "Person");
+        var $father = array(type => ForeignKey, related_with => "Person");
+        var $school = array(type => ForeignKey, related_with => "School");
     }
+
 
 #### Create all declared Models as tables in the database
 
     Joy::syncdb();
-
 
 ## running tests
 
