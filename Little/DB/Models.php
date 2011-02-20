@@ -67,6 +67,10 @@ class ModelJoy {
         array_push($parts, ");");
         return implode("\n", $parts);
     }
+    public static function syncdb($connection=null){
+        $klass = get_called_class();
+        mysql_query($klass::as_table_string(), $connection ? $connection : Joy::get_current_mysql_connection());
+    }
 }
 
 ?>

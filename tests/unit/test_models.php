@@ -20,11 +20,25 @@ CREATE TABLE `Person`(
     `birthday` datetime NULL
 );";
 
+class Permission extends ModelJoy {
+    var $person = array(type => ForeignKey, related_with => "Person");
+    var $name = array(type => CharField, max_length => 100);
+    var $group = array(type => ForeignKey, related_with => "Group");
+}
+class Group extends ModelJoy {
+    var $name = array(type => CharField, max_length => 100);
+    var $members = array(type => ManyToManyField, related_with => "Person");
+}
 class TestModelJoy extends PHPUnit_Framework_TestCase {
-    public function testDDL() {
+    public function testPersonDDL() {
         global $person_ddl;
         $this->assertEquals(trim($person_ddl), Person::as_table_string());
     }
+    public function testPermissionDDL() {
+        global $permission_ddl;
+        $this->assertEquals(trim($permission_ddl), Permission::as_table_string());
+    }
+
 }
 
 ?>

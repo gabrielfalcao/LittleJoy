@@ -63,10 +63,70 @@ function import($path, $absolute_to_joy=true) {
 }
 
 import("DB/Joy");
+class DatabaseDoesNotExist extends Exception {}
+define("DatabaseDoesNotExist", "DatabaseDoesNotExist");
+class CouldNotConnectToDatabase extends Exception {}
+define("CouldNotConnectToDatabase", "CouldNotConnectToDatabase");
+class NoDatabaseRegistered extends Exception {}
+define("NoDatabaseRegistered", "NoDatabaseRegistered");
 
 class Joy {
     public static function version (){
         return "0.1";
+    }
+    public static function set_mysql_database($host, $user, $password, $database){
+        $GLOBALS["__little_joy_mysql_user__"] = $user;
+        $GLOBALS["__little_joy_mysql_host__"] = $host;
+        $GLOBALS["__little_joy_mysql_password__"] = $password;
+        $GLOBALS["__little_joy_mysql_database__"] = $database;
+
+    }
+    public static function connect_to_mysql_database($host, $user, $password, $database){
+        self::set_mysql_database($host, $user, $password, $database);
+        return self::connect_to_registered_database();
+    }
+
+    public static function disconnect_from_registered_database(){
+        mysql_close($GLOBALS["__little_joy_mysql_connection__"]);
+        unset($GLOBALS["__little_joy_mysql_connection__"]);
+
+    }
+    public static function connect_to_registered_database(){
+        if (!array_key_exists("__little_joy_mysql_host__", $GLOBALS)) {
+            throw new NoDatabaseRegistered("Joy::set_mysql_database must be called before Joy::connect_to_registered_database");
+        }
+        $user = $GLOBALS["__little_joy_mysql_user__"];
+        $host = $GLOBALS["__little_joy_mysql_host__"];
+        $password = $GLOBALS["__little_joy_mysql_password__"];
+        $database = $GLOBALS["__little_joy_mysql_database__"];
+
+        $c = mysql_connect($host, $user, is_null($password) ? "": $password);
+        if (!$c) {
+            throw new CouldNotConnectToDatabase("Could not connect to the database $user:$password@$host");
+        }
+        $GLOBALS["__little_joy_mysql_connection__"] = $c;
+        mysql_set_charset("utf-8", $c);
+        if (mysql_select_db($database, $c)) {
+            return $c;
+        } else {
+            throw new DatabaseDoesNotExist("The database \"$database\" does not exist!". mysql_error());
+        }
+    }
+    public static function get_current_mysql_connection() {
+            if (!array_key_exists("__little_joy_mysql_connection__", $GLOBALS)) {
+                throw new Exception("You must call Joy::connect_to_mysql_database() before calling any Model::syncdb()");
+            }
+            return $GLOBALS["__little_joy_mysql_connection__"];
+    }
+    public static function syncdb() {
+        $con = self::connect_to_registered_database();
+        foreach (get_declared_classes() as $klass):
+            $parent = get_parent_class($klass);
+            if ($parent == "ModelJoy") {
+                $klass::syncdb();
+            }
+        endforeach;
+        self::disconnect_from_registered_database();
     }
 }
 

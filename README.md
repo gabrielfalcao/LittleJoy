@@ -40,6 +40,8 @@ It's inspired on
 [django's model declaration](http://docs.djangoproject.com/en/dev/topics/db/models/),
 so if you already worked with Django, it will not be a problem.
 
+#### Declare your models sweetly
+
     require_once "Little/Joy.php";
 
     class Person extends ModelJoy {
@@ -51,21 +53,9 @@ so if you already worked with Django, it will not be a problem.
         var $birthday = array(type => DateTimeField, nullable => true);
     }
 
-Get the string that creates the table:
+#### Create all declared Models as tables in the database
 
-    Person::as_table_string();
-
-Returns
-
-    CREATE TABLE `Person`(
-        `ID` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,
-        `name` varchar(100) NOT NULL,
-        `email` varchar(255) NOT NULL,
-        `bio` longtext NOT NULL,
-        `website` varchar(255) NOT NULL,
-        `gender` varchar(6) NULL,
-        `birthday` datetime NULL
-    );
+    Joy::syncdb();
 
 
 ## running tests
