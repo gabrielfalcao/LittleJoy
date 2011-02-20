@@ -41,6 +41,77 @@ import("DB/Fields");
  */
 
 class ModelJoy {
+    public function prepare_insert(){
+        $klass = get_class($this);
+        $fields = "";
+        $values = "";
+        foreach ($klass::get_fields() as $field_name => $data) {
+            $field = $data['field'];
+            $value = $this->$field_name;
+            $fields .= "`{$field->db_column}`, ";
+            $values .= "'{$value}', ";
+        }
+        $fields = substr($fields, 0, -2);
+        $values = substr($values, 0, -2);
+
+        return "INSERT INTO `{$klass}` ({$fields}) VALUES ($values);";
+    }
+    public function prepare_update(){
+        $klass = get_class($this);
+        $fields = "";
+        foreach ($klass::get_fields() as $field_name => $data) {
+            $field = $data['field'];
+            $value = $this->$field_name;
+            $fields .= "`{$field->db_column}` = '{$value}', ";
+        }
+        $fields = substr($fields, 0, -2);
+
+        return "UPDATE `{$klass}` SET {$fields} WHERE ID = {$this->ID};";
+    }
+    public function save(){
+        $this->connection = Joy::connect_to_registered_database();
+        if (!array_key_exists("ID", get_object_vars($this))) {
+            mysql_query($this->prepare_insert(), $this->connection);
+            $this->ID = mysql_insert_id($this->connection);
+        } else {
+            mysql_query($this->prepare_update(), $this->connection);
+        }
+    }
+    public static function __callStatic($name, $arguments) {
+        $db_table = get_called_class();
+        $matches = array();
+        if (preg_match("/^find_one_by_(.*)/", $name, $matches)){
+            $res = mysql_query("SELECT * FROM `$db_table` WHERE `{$matches[1]}` = '{$arguments[0]}'", Joy::get_current_mysql_connection());
+            return self::populated_with(mysql_fetch_assoc($res));
+        } else {
+            return parent::__callStatic($name, $arguments);
+        }
+    }
+
+    public static function populated_with($data){
+        $klass = get_called_class();
+        $object = new $klass();
+        foreach ($data as $key => $value) {
+            $object->$key = $value;
+        }
+        return $object;
+    }
+    public static function get_fields(){
+        $klass = get_called_class();
+        $fields = array();
+        foreach (get_class_vars($klass) as $field_name => $declaration):
+            $field = $declaration[type]::from_declaration_array($field_name,
+                                                                $declaration);
+            $field_type = $declaration[type];
+            $fields[$field_name] = array(
+                "field_name" => $field_name,
+                "field" => $field,
+                "field_type" => $field_type,
+                "declaration" => $declaration
+            );
+        endforeach;
+        return $fields;
+    }
     /**
      * Returns a DDL string for creating the table in MySQL
      * @return string

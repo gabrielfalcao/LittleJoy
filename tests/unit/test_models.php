@@ -51,6 +51,10 @@ ALTER TABLE `PersonGroup_M2M` ADD CONSTRAINT `PersonGroup_M2M` FOREIGN KEY (`Per
 ALTER TABLE `PersonGroup_M2M` ADD CONSTRAINT `GroupPerson_M2M` FOREIGN KEY (`Group__ID`) REFERENCES `Group` (`ID`);
 ";
 
+class Foo extends ModelJoy {
+    var $bar = array(type => CharField, max_length => 100);
+    var $baz = array(type => TextField);
+}
 class TestModelJoy extends PHPUnit_Framework_TestCase {
     public function testPersonDDL() {
         global $person_ddl;
@@ -64,6 +68,17 @@ class TestModelJoy extends PHPUnit_Framework_TestCase {
         global $group_ddl;
         $this->assertEquals(trim($group_ddl), Group::as_table_string());
     }
+    public function testPrepareInsert(){
+        $one = Foo::populated_with(array("bar" => "TDD", "baz" => "rockz"));
+        $this->assertEquals($one->bar, "TDD");
+        $this->assertEquals($one->baz, "rockz");
+        $this->assertEquals($one->prepare_insert(), "INSERT INTO `Foo` (`bar`, `baz`) VALUES ('TDD', 'rockz');");
+    }
+    public function testPrepareUpdate(){
+        $one = Foo::populated_with(array("bar" => "TDD", "baz" => "rockz", "ID" => 987));
+        $this->assertEquals($one->prepare_update(), "UPDATE `Foo` SET `bar` = 'TDD', `baz` = 'rockz' WHERE ID = 987;");
+    }
+
 }
 
 ?>

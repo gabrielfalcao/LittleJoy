@@ -46,7 +46,6 @@ so if you already worked with Django, it will not be a problem.
 
     class School extends ModelJoy {
         var $name = array(type => CharField, max_length => 100);
-        var $address = array(type => TextField);
         var $website = array(type => URLField);
     }
 
@@ -67,6 +66,19 @@ so if you already worked with Django, it will not be a problem.
 #### Create all declared Models as tables in the database
 
     Joy::syncdb();
+
+#### Now you can play with it
+
+    $school = School::populated_with(array("name" => "Harvard School of Engineer and Applied Sciences", "website" => "http://seas.harvard.edu/"));
+    $school->save(); //performs a INSERT
+
+    $school->website = http://new-website.url";
+    $school->save(); //performs a UPDATE
+
+    $found_by_name = School::find_by_name("Harvard School of Engineer and Applied Sciences");
+    $found_by_website = School::find_by_website("http://new-website.url");
+
+    $found_by_website->name === $found_by_name->name === $school->name;
 
 ## running tests
 
