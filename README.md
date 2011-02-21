@@ -40,7 +40,7 @@ Within your code, require LittleJoy's bootstrap file:
 Simple example, just put the code below in your `index.php` file, in Apache's DocRoot:
 
     <?php
-    require_once("LittleJoy/Little/Joy.php");
+    require_once Little/Joy.php";
 
     class Main extends ControllerJoy {
         var $urls = array(
