@@ -150,21 +150,7 @@ class ControllerJoy {
         return '500 Internal Server Error';
     }
     public function render($name, $context) {
-
         $viewdir = $GLOBALS["__little_joy_views_dir__"];
-        $tmpdir = $viewdir.DIRECTORY_SEPARATOR."tmp";
-        if (!file_exists($tmpdir)) {
-            if (!is_writable($viewdir)) {
-                die("$viewdir should be writable in order to render haml templates");
-            }
-
-            mkdir($tmpdir);
-        } else {
-            if (!is_writable($tmpdir)) {
-                die("$tmpdir should be writable in order to render haml templates");
-            }
-
-        }
         $fullpath = $viewdir.DIRECTORY_SEPARATOR.trim($name, "/");
 
         $parser = new HamlParser(false, false);
@@ -172,9 +158,12 @@ class ControllerJoy {
         foreach ($context as $key => $value):
             $parser->assign($key, $value);
         endforeach;
-        $parser->setTmp($tmpdir);
+
+        $parser->setTmp(sys_get_temp_dir());
         $parser->setFile($fullpath);
-        return $parser->render();
+        $rendered = @$parser->render();
+        $parser->clearCompiled();
+        return $rendered;
     }
     public static function fix_regex($pre_regex) {
         // fixing starts
