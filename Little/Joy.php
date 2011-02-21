@@ -53,16 +53,16 @@
  *  @param bool $absolute_to_joy if the import should be prepended by the absolute path to LittleJoy's root dir. Defaults to true
  */
 
-function import($path, $absolute_to_joy=true) {
+function import($path, $absolute_to=__FILE__) {
     $parts = explode("/", $path);
-    if ($absolute_to_joy){
-        $here = dirname(realpath(__FILE__));
-        array_unshift($parts, $here);
-    }
+    array_unshift($parts, dirname(realpath($absolute_to)));
+
     require_once join(DIRECTORY_SEPARATOR, $parts).".php";
 }
 
 import("DB/Joy");
+import("Controllers/Joy");
+
 class DatabaseDoesNotExist extends Exception {}
 define("DatabaseDoesNotExist", "DatabaseDoesNotExist");
 class CouldNotConnectToDatabase extends Exception {}
@@ -127,6 +127,11 @@ class Joy {
             }
         endforeach;
         self::disconnect_from_registered_database();
+    }
+    public static function and_work() {
+        $route = RouteJoy::resolve($_SERVER["REQUEST_URI"]);
+        $response = new ResponseJoy(200);
+        echo $route->process($response);
     }
 }
 
