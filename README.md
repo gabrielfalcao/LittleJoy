@@ -37,6 +37,17 @@ Simple example, just put the code below in your `index.php` file, in Apache's Do
     Joy::and_work();
     ?>
 
+### note on nice urls
+
+You need [mod_rewrite](http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html) working in your apache
+and the following rewrite configuration:
+
+    RewriteEngine On
+    RewriteBase /
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . /index.php [L]
+
 ## Active Record
 
 It's inspired on
