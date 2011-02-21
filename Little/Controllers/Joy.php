@@ -149,20 +149,22 @@ class ControllerJoy {
         $response->set_http_status(500);
         return '500 Internal Server Error';
     }
-    public function render($name, $context) {
+    public function render($name, $context=null) {
         $viewdir = $GLOBALS["__little_joy_views_dir__"];
         $fullpath = $viewdir.DIRECTORY_SEPARATOR.trim($name, "/");
 
         $parser = new HamlParser(false, false);
 
-        foreach ($context as $key => $value):
-            $parser->assign($key, $value);
-        endforeach;
+        if (is_array($context)) {
+            foreach ($context as $key => $value):
+                $parser->assign($key, $value);
+            endforeach;
+        }
 
         $parser->setTmp(sys_get_temp_dir());
         $parser->setFile($fullpath);
         $rendered = @$parser->render();
-        $parser->clearCompiled();
+        @$parser->clearCompiled();
         return $rendered;
     }
     public static function fix_regex($pre_regex) {
