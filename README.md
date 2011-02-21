@@ -2,40 +2,18 @@
 
 Really tiny php framework focused on easy-to-write and easy-to-run tests through [phpunit](http://phpunit.de)
 
-## installing
+# hands on
 
-The very first thing you must install is PHPUnit, but since it's
-documentation is quite a bit out-of-date, here is a small walk-through:
+Installation-free, just grab the code and copy the folder `Little` to
+your project root.
 
-**ATTENTION**: this walkthrough consider that you have [pear](http://pear.php.net) installed on your computer.
+Within your code, let's say `index.php`, all you have to do is require LittleJoy's bootstrap file:
 
+> require_once "Little/Joy.php";
 
-1. Add a few channels on your pear
+and start hacking!
 
-    sudo pear channel-discover pear.phpunit.de
-    sudo pear channel-discover pear.symfony-project.com
-    sudo pear channel-discover components.ez.no
-
-2. Update your official channel
-
-    sudo pear channel-update pear.php.net
-
-3. Update your pear version
-
-    sudo pear upgrade pear
-
-4. Finally install PHPUnit
-
-    sudo pear install --alldeps pear.phpunit.de/PHPUnit
-
-## hands on
-
-Within your code, require LittleJoy's bootstrap file:
-
-    require_once "Little/Joy.php";
-
-
-### Controllers
+## Controllers
 
 Simple example, just put the code below in your `index.php` file, in Apache's DocRoot:
 
@@ -59,13 +37,13 @@ Simple example, just put the code below in your `index.php` file, in Apache's Do
     Joy::and_work();
     ?>
 
-### Active Record
+## Active Record
 
 It's inspired on
 [django's model declaration](http://docs.djangoproject.com/en/dev/topics/db/models/),
 so if you already worked with Django, it will not be a problem.
 
-#### Declare your models sweetly
+### Declare your models sweetly
 
     require_once "Little/Joy.php";
 
@@ -88,11 +66,11 @@ so if you already worked with Django, it will not be a problem.
     }
 
 
-#### Create all declared Models as tables in the database
+### Create all declared Models as tables in the database
 
     Joy::syncdb();
 
-#### Now you can play with it
+### Now you can play with it
 
     $school = School::populated_with(array("name" => "Harvard School of Engineer and Applied Sciences", "website" => "http://seas.harvard.edu/"));
     $school->save(); //performs a INSERT
@@ -105,8 +83,34 @@ so if you already worked with Django, it will not be a problem.
 
     $found_by_website->name === $found_by_name->name === $school->name;
 
-## running tests
+# Contributing
 
-    cd LittleJoy
-    make test
+## install dependencies to run tests
 
+The very first thing you must install is PHPUnit, but since it's
+documentation is quite a bit out-of-date, here is a small walk-through:
+
+**ATTENTION**: this walkthrough consider that you have [pear](http://pear.php.net) installed on your computer.
+
+1. Add a few channels on your pear
+2. Update your official channel
+3. Update your pear version
+4. Finally install PHPUnit
+
+### OK, here is the big command, just paste it in your terminal
+
+    sudo pear channel-discover pear.phpunit.de
+    sudo pear channel-discover pear.symfony-project.com
+    sudo pear channel-discover components.ez.no
+    sudo pear channel-update pear.php.net
+    sudo pear upgrade pear
+    sudo pear install --alldeps pear.phpunit.de/PHPUnit
+
+1. fork and clone the project
+2. install the dependencies above
+3. run the tests with make:
+    > make unit functional
+
+4. hack at will
+5. commit, push etc
+6. send a pull request
