@@ -25,6 +25,7 @@
  OTHER DEALINGS IN THE SOFTWARE.
 
 ***********************************************************************/
+import("haml/HamlParser.class");
 
 class IncompleteControllerError extends Exception {}
 define("IncompleteControllerError", "IncompleteControllerError");
@@ -148,7 +149,33 @@ class ControllerJoy {
         $response->set_http_status(500);
         return '500 Internal Server Error';
     }
+    public function render($name, $context) {
 
+        $viewdir = $GLOBALS["__little_joy_views_dir__"];
+        $tmpdir = $viewdir.DIRECTORY_SEPARATOR."tmp";
+        if (!file_exists($tmpdir)) {
+            if (!is_writable($viewdir)) {
+                die("$viewdir should be writable in order to render haml templates");
+            }
+
+            mkdir($tmpdir);
+        } else {
+        if (!is_writable($tmpdir)) {
+            die("$tmpdir should be writable in order to render haml templates");
+        }
+
+        }
+        $fullpath = $viewdir.DIRECTORY_SEPARATOR.trim($name, "/");
+
+        $parser = new HamlParser();
+
+        foreach ($context as $key => $value):
+            $parser->assign($key, $value);
+        endforeach;
+        $parser->setTmp($tmpdir);
+        $parser->setFile($fullpath);
+        return $parser->render();
+    }
     public static function fix_regex($pre_regex) {
         // fixing starts
         $pre_regex = ltrim($pre_regex, "^/");

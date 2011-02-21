@@ -133,6 +133,10 @@ class Joy {
         $response = new ResponseJoy(200);
         echo $route->process($response);
     }
+    public static function find_templates_at($base, $postpath){
+        $path = dirname($base).DIRECTORY_SEPARATOR.$postpath;
+        $GLOBALS["__little_joy_views_dir__"] = $path;
+    }
 }
 
 ?>
