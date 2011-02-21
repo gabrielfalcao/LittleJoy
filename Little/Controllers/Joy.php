@@ -160,14 +160,14 @@ class ControllerJoy {
 
             mkdir($tmpdir);
         } else {
-        if (!is_writable($tmpdir)) {
-            die("$tmpdir should be writable in order to render haml templates");
-        }
+            if (!is_writable($tmpdir)) {
+                die("$tmpdir should be writable in order to render haml templates");
+            }
 
         }
         $fullpath = $viewdir.DIRECTORY_SEPARATOR.trim($name, "/");
 
-        $parser = new HamlParser();
+        $parser = new HamlParser(false, false);
 
         foreach ($context as $key => $value):
             $parser->assign($key, $value);
