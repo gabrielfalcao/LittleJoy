@@ -106,11 +106,14 @@ documentation is quite a bit out-of-date, here is a small walk-through:
     sudo pear upgrade pear
     sudo pear install --alldeps pear.phpunit.de/PHPUnit
 
-1. fork and clone the project
-2. install the dependencies above
-3. run the tests with make:
+## next steps
+
+### 1. fork and clone the project
+### 2. install the dependencies above
+### 3. run the tests with make:
+
     > make unit functional
 
-4. hack at will
-5. commit, push etc
-6. send a pull request
+### 4. hack at will
+### 5. commit, push etc
+### 6. send a pull request
