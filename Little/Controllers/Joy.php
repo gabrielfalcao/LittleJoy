@@ -196,7 +196,7 @@ class ControllerJoy {
         foreach ($ctrl->urls as $pre_regex => $callable_name):
             // some validation
             if (!in_array($callable_name, $methods)){
-                throw new WrongURLSet("The controller $klass are mapping the url \"$pre_regex\" to the method \"$callable_name\" which is not declared within it");
+                throw new WrongURLSet("The controller $klass is mapping the url \"$pre_regex\" to the method \"$callable_name\" which is not declared within it");
             }
 
             $mapped_url = $pre_regex;

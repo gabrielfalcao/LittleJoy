@@ -18,7 +18,7 @@ and start hacking!
 Simple example, just put the code below in your `index.php` file, in Apache's DocRoot:
 
     <?php
-    require_once Little/Joy.php";
+    require_once "Little/Joy.php";
 
     class Main extends ControllerJoy {
         var $urls = array(
@@ -89,8 +89,8 @@ so if you already worked with Django, it will not be a problem.
     $school->website = http://new-website.url";
     $school->save(); //performs a UPDATE
 
-    $found_by_name = School::find_by_name("Harvard School of Engineer and Applied Sciences");
-    $found_by_website = School::find_by_website("http://new-website.url");
+    $found_by_name = School::find_one_by_name("Harvard School of Engineer and Applied Sciences");
+    $found_by_website = School::find_one_by_website("http://new-website.url");
 
     $found_by_website->name === $found_by_name->name === $school->name;
 
