@@ -1,0 +1,10 @@
+<phpunit backupGlobals="true"
+         backupStaticAttributes="true"
+         verbose="true"
+         bootstrap="__root__/Little/Joy.php">
+  <testsuites>
+    <testsuite name="__kind__ tests">
+      __files__
+    </testsuite>
+  </testsuites>
+</phpunit>

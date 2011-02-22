@@ -8,3 +8,5 @@ build/
 dist/
 .DS_Store
 *.swp
+tests/unit/configuration.xml
+tests/functional/configuration.xml
