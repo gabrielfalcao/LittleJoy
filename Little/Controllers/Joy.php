@@ -126,7 +126,7 @@ class RouteJoy {
         $route = null;
         foreach (get_declared_classes() as $klass):
             $parent = get_parent_class($klass);
-            if ($parent == "ControllerJoy") {
+            if ($parent == ControllerJoy) {
                 $candidate = $klass::get_route_for($request_uri);
                 if ($candidate && get_class($candidate) == RouteJoy){
                     $route = $candidate;

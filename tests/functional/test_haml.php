@@ -4,7 +4,7 @@ require_once('PHPUnit/Extensions/OutputTestCase.php');
 
 class HamlController extends ControllerJoy {
     var $urls = array(
-        "^mood/(.*)" => 'render_haml',
+        "^mood/([^/]+)" => 'render_haml',
     );
     public function render_haml ($response, $params) {
         $now = "22/02/2011";
@@ -23,8 +23,8 @@ class TestControllerRenderHaml extends PHPUnit_Extensions_OutputTestCase
     <span id=\"mood\">22/02/2011 is a happy day !</span>
   </div>
 </div>");
-        $route = HamlController::get_route_for("/mood/happy");
-        printf($route->process(null));
+        $_SERVER['REQUEST_URI'] = '/mood/happy/';
+        Joy::and_work();
     }
 }
 ?>
