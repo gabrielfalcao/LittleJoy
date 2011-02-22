@@ -62,6 +62,7 @@ function import($path, $absolute_to=__FILE__) {
 
 import("DB/Joy");
 import("Controllers/Joy");
+import("Views/Joy");
 
 class DatabaseDoesNotExist extends Exception {}
 define("DatabaseDoesNotExist", "DatabaseDoesNotExist");
@@ -131,7 +132,7 @@ class Joy {
     public static function and_work() {
         $route = RouteJoy::resolve($_SERVER["REQUEST_URI"]);
         $response = new ResponseJoy(200);
-        echo $route->process($response);
+        printf($route->process($response));
     }
     public static function find_templates_at($base, $postpath){
         $path = dirname($base).DIRECTORY_SEPARATOR.$postpath;

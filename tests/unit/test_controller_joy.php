@@ -49,7 +49,7 @@ class TestControllerJoy extends PHPUnit_Framework_TestCase {
 
     public function testResponseString(){
         $route = RouteJoy::resolve("/");
-        $this->assertEquals($route->process(NULL), "Got the index");
+        $this->assertEquals($route->process(null), "Got the index");
     }
     public function testResponse404(){
         $response = $this->getMock('ResponseJoy', array("set_http_status"), array(200));
