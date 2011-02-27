@@ -26,15 +26,27 @@
 
 ***********************************************************************/
 
-/**
- * This file is just a single way to import all database-related files
- *
- * @author Gabriel Falcão <gabriel@nacaolivre.org>
- * @license http://www.opensource.org/licenses/mit-license.php MIT License
- * @version 0.1
- * @package LittleJoy
- */
+import("Views/lessc.inc");
+define("LessJoy", "LessJoy");
 
-import("DB/Models");
+define("serve_lesscss_from", "serve_lesscss_from");
+define("serve_lesscss_on", "serve_lesscss_on");
+
+class LessJoy extends ControllerJoy {
+    var $urls = array(
+        "(?P<path>.*)[.]css$" => "serve",
+    );
+    public function serve($response, $params, $route) {
+        $fallback = FileSystemJoy::absolute_path("stylesheets");
+        $basepath = Joy::get(serve_lesscss_from, $fallback);
+        $basepath = FileSystemJoy::turn_array_into_path_if_needed($basepath);
+        $fullpath = FileSystemJoy::absolute_path($params['path'].'.less', $basepath);
+
+
+        $less = new lessc($fullpath);
+        $response->set_http_header('Content-Type', 'text/css');
+        return $less->parse();
+    }
+}
 
 ?>

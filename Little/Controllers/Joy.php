@@ -96,7 +96,12 @@ class ResponseJoy {
     public function set_http_header($pre_key, $pre_value){
         $key = self::fix_http_header_key($pre_key);
         $value = trim($pre_value);
-        header("$key: $value", true, $this->status);
+        @header("$key: $value", true, $this->status);
+    }
+    public function redirect_to($url, $temporary=true){
+        $this->set_http_header('location', $url);
+        $this->set_http_status($temporary ? 307 : 301);
+        die('');
     }
 }
 class RouteJoy {
@@ -107,19 +112,22 @@ class RouteJoy {
         $this->matches = $matches;
         $this->mapped_url = $mapped_url;
         $this->regex = $regex;
+        $this->method = array_key_exists("METHOD", $_SERVER) ?
+            $_SERVER['REQUEST_METHOD'] : null;
     }
     public function process($response){
         $method = $this->controller_method;
         try {
             return $this->controller->$method($response, $this->matches, $this);
         } catch (Exception $e) {
+            $trace = debug_backtrace(true);
             if ($response == null) {
                 throw $e;
             }
             $ctrl = new ControllerJoy();
             $this->controller = $ctrl;
             $this->controller_method = "handle_500";
-            return $ctrl->handle_500($response, $this->matches, $this, $e);
+            return $ctrl->handle_500($response, $this->matches, $this, $e, $trace);
         }
     }
     public static function resolve($request_uri) {
@@ -143,14 +151,25 @@ class RouteJoy {
 }
 
 class ControllerJoy {
+    private static $enabled = true;
     public function handle_404($response, $matches, $route) {
         $response->set_http_status(404);
-        return '404 Not Found';
+        return '<h1>404 Not Found</h1>';
     }
-    public function handle_500($response, $matches, $route, $exception) {
+    public function handle_500($response, $matches, $route, $exception, $backtrace) {
         $response->set_http_status(500);
-        return '500 Internal Server Error';
+        return "<h1>500 Internal Server Error</h1>\n<br />\n<pre><code>\n$exception</code></pre>";
     }
+    public static function shutdown(){
+        self::$enabled = false;
+    }
+    public static function turn_on(){
+        self::$enabled = true;
+    }
+    public static function is_down(){
+        return !self::$enabled;
+    }
+
     public static function fix_regex($pre_regex) {
         // fixing starts
         $pre_regex = ltrim($pre_regex, "^/");
@@ -167,7 +186,7 @@ class ControllerJoy {
         $klass = get_called_class();
 
         /* skipping myself */
-        if ($klass == "ControllerJoy") {return;}
+        if ($klass == "ControllerJoy" || $klass::is_down()) {return;}
 
         $members = get_class_vars($klass);
         $methods = get_class_methods($klass);

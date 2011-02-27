@@ -25,7 +25,7 @@
  OTHER DEALINGS IN THE SOFTWARE.
 
 ***********************************************************************/
-import("DB/Fields");
+import("Models/Fields");
 
 /**
  * LittleJoy's base model,
@@ -82,6 +82,9 @@ class ModelJoy {
         $matches = array();
         if (preg_match("/^find_one_by_(.*)/", $name, $matches)){
             $res = mysql_query("SELECT * FROM `$db_table` WHERE `{$matches[1]}` = '{$arguments[0]}'", Joy::get_current_mysql_connection());
+            if (!$res) {
+                return null;
+            }
             return self::populated_with(mysql_fetch_assoc($res));
         } else {
             return parent::__callStatic($name, $arguments);

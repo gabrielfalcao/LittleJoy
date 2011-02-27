@@ -57,12 +57,20 @@ function import($path, $absolute_to=__FILE__) {
     $parts = explode("/", $path);
     array_unshift($parts, dirname(realpath($absolute_to)));
 
-    require_once join(DIRECTORY_SEPARATOR, $parts).".php";
-}
+    $to_import = join(DIRECTORY_SEPARATOR, $parts).".php";
 
-import("DB/Joy");
-import("Controllers/Joy");
-import("Views/Joy");
+    $overjoyed = preg_replace(',[.]php$,', DIRECTORY_SEPARATOR.'Joy.php', $to_import);
+    if (file_exists($overjoyed) && is_file($overjoyed)) {
+        require_once $overjoyed;
+    } else {
+        require_once $to_import;
+    }
+}
+import("Signals");
+import("FileSystem");
+import("Models");
+import("Controllers");
+import("Views");
 
 class DatabaseDoesNotExist extends Exception {}
 define("DatabaseDoesNotExist", "DatabaseDoesNotExist");
@@ -70,6 +78,8 @@ class CouldNotConnectToDatabase extends Exception {}
 define("CouldNotConnectToDatabase", "CouldNotConnectToDatabase");
 class NoDatabaseRegistered extends Exception {}
 define("NoDatabaseRegistered", "NoDatabaseRegistered");
+
+$GLOBALS["__little_joy_config__"] = array();
 
 class Joy {
     public static function version (){
@@ -80,7 +90,6 @@ class Joy {
         $GLOBALS["__little_joy_mysql_host__"] = $host;
         $GLOBALS["__little_joy_mysql_password__"] = $password;
         $GLOBALS["__little_joy_mysql_database__"] = $database;
-
     }
     public static function connect_to_mysql_database($host, $user, $password, $database){
         self::set_mysql_database($host, $user, $password, $database);
@@ -101,7 +110,7 @@ class Joy {
         $password = $GLOBALS["__little_joy_mysql_password__"];
         $database = $GLOBALS["__little_joy_mysql_database__"];
 
-        $c = mysql_connect($host, $user, is_null($password) ? "": $password);
+        $c = @mysql_connect($host, $user, is_null($password) ? "": $password);
         if (!$c) {
             throw new CouldNotConnectToDatabase("Could not connect to the database $user:$password@$host");
         }
@@ -119,24 +128,138 @@ class Joy {
             }
             return $GLOBALS["__little_joy_mysql_connection__"];
     }
-    public static function syncdb() {
-        $con = self::connect_to_registered_database();
+    public static function enjoy_models(){
+        $models = array();
         foreach (get_declared_classes() as $klass):
             $parent = get_parent_class($klass);
             if ($parent == "ModelJoy") {
-                $klass::syncdb();
+                array_push($models, $klass);
             }
+        endforeach;
+        return $models;
+    }
+
+    public static function syncdb() {
+        $con = self::connect_to_registered_database();
+        foreach (self::enjoy_models() as $model):
+            $model::syncdb();
         endforeach;
         self::disconnect_from_registered_database();
     }
-    public static function and_work() {
-        $route = RouteJoy::resolve($_SERVER["REQUEST_URI"]);
+    private static function _store_work_params($params){
+        foreach ($params as $key => $value){
+            self::set($key, $value);
+        }
+    }
+    public static function and_work($params=null) {
+        if (is_array($params)){
+            self::_store_work_params($params); /////////////////////////// <<<<<<------
+        } else if ($params != null){
+            $_kind = gettype($params);
+            throw new Exception("Joy::and_work() takes a keyword based array with startup options, got \"$_kind\"");
+        }
+        $request_path = $_SERVER["REQUEST_URI"];
+        if (array_key_exists('QUERY_STRING', $_SERVER)) {
+            $qs = preg_quote($_SERVER['QUERY_STRING']);
+            $request_path = preg_replace(",[?]$qs$,", "", $request_path);
+        }
+        $route = RouteJoy::resolve($request_path);
         $response = new ResponseJoy(200);
-        printf($route->process($response));
+        echo trim($route->process($response));
     }
     public static function find_templates_at($base, $postpath){
         $path = dirname($base).DIRECTORY_SEPARATOR.$postpath;
         $GLOBALS["__little_joy_views_dir__"] = $path;
+    }
+    public static function get($key, $fallback=null){
+        if (!array_key_exists($key, $GLOBALS["__little_joy_config__"])){
+            return $fallback;
+        }
+        return $GLOBALS["__little_joy_config__"][$key];
+    }
+    public static function set($key, $value){
+        $GLOBALS["__little_joy_config__"][$key] = $value;
+        return $GLOBALS["__little_joy_config__"];
+    }
+    public static function debug_as_json($json)
+    {
+        $tab = "  ";
+        $new_json = "";
+        $indent_level = 0;
+        $in_string = false;
+        if (is_array($json)){
+            $json_obj = $json;
+        } else {
+            $json_obj = json_decode($json);
+        }
+
+        if($json_obj === false)
+            return false;
+
+        $json = json_encode($json_obj);
+        $len = strlen($json);
+
+        for($c = 0; $c < $len; $c++)
+            {
+                $char = $json[$c];
+                switch($char)
+                    {
+                    case '{':
+                    case '[':
+                        if(!$in_string)
+                            {
+                                $new_json .= $char . "\n" . str_repeat($tab, $indent_level+1);
+                                $indent_level++;
+                            }
+                        else
+                            {
+                                $new_json .= $char;
+                            }
+                        break;
+                    case '}':
+                    case ']':
+                        if(!$in_string)
+                            {
+                                $indent_level--;
+                                $new_json .= "\n" . str_repeat($tab, $indent_level) . $char;
+                            }
+                        else
+                            {
+                                $new_json .= $char;
+                            }
+                        break;
+                    case ',':
+                        if(!$in_string)
+                            {
+                                $new_json .= ",\n" . str_repeat($tab, $indent_level);
+                            }
+                        else
+                            {
+                                $new_json .= $char;
+                            }
+                        break;
+                    case ':':
+                        if(!$in_string)
+                            {
+                                $new_json .= ": ";
+                            }
+                        else
+                            {
+                                $new_json .= $char;
+                            }
+                        break;
+                    case '"':
+                        if($c > 0 && $json[$c-1] != '\\')
+                            {
+                                $in_string = !$in_string;
+                            }
+                    default:
+                        $new_json .= $char;
+                        break;
+                    }
+            }
+
+        return $new_json;
     }
 }
 

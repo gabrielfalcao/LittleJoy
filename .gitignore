@@ -10,3 +10,4 @@ dist/
 *.swp
 tests/unit/configuration.xml
 tests/functional/configuration.xml
+tests/functional/sass-files/4bbe26a669a14a7640833ad896a5a7e4.css

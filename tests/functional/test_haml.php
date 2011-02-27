@@ -17,13 +17,15 @@ class TestControllerRenderHaml extends PHPUnit_Extensions_OutputTestCase
 {
     public function testExpectHaml1()
     {
+
         $this->expectOutputString(
-"\t<div id=\"profile\">
+"<div id=\"profile\">
   <div class=\"description\">
     <span id=\"mood\">22/02/2011 is a happy day !</span>
   </div>
 </div>");
-        $_SERVER['REQUEST_URI'] = '/mood/happy/';
+        $_SERVER['QUERY_STRING'] = 'nocache=true';
+        $_SERVER['REQUEST_URI'] = '/mood/happy/?nocache=true';
         Joy::and_work();
     }
 }

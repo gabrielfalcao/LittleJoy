@@ -64,7 +64,22 @@ class TestControllerJoy extends PHPUnit_Framework_TestCase {
         $this->assertEquals($route->mapped_url, null);
         $this->assertEquals($route->regex, null);
 
-        $this->assertEquals($route->process($response), "404 Not Found");
+        $this->assertContains("404 Not Found", $route->process($response));
+    }
+    public function testShutdownController(){
+        $response = $this->getMock('ResponseJoy', array("set_http_status"), array(200));
+        $response->expects($this->any())
+            ->method('set_http_status')
+            ->with(404);
+
+        SomeFooBarController::shutdown();
+        $route = RouteJoy::resolve("/");
+        $this->assertContains("404 Not Found", $route->process($response));
+
+        SomeFooBarController::turn_on();
+        $route = RouteJoy::resolve("/");
+        $this->assertEquals($route->process(null), "Got the index");
+
     }
 
     public function testResponse500(){
@@ -75,7 +90,7 @@ class TestControllerJoy extends PHPUnit_Framework_TestCase {
 
 
         $route = RouteJoy::resolve("/fail/me");
-        $this->assertEquals($route->process($response), "500 Internal Server Error");
+        $this->assertContains("500 Internal Server Error", $route->process($response));
         $this->assertEquals(get_class($route->controller), "ControllerJoy");
         $this->assertEquals($route->controller_method, "handle_500");
         $this->assertEquals($route->mapped_url, "^fail/me");

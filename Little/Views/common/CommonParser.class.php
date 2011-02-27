@@ -35,7 +35,7 @@ abstract class CommonParser
 	 * @return string
 	 */
 	abstract public function render($file = null, $renderer = null);
-	
+
 	/**
 	 * Render source
 	 *
@@ -46,10 +46,10 @@ abstract class CommonParser
 	{
 		return $this->render();
 	}
-	
+
 	/**
 	 * Display source
-	 * 
+	 *
 	 * @param string Filename
 	 * @param string Renderer class
 	 * @see CommonParser::render()
@@ -60,7 +60,7 @@ abstract class CommonParser
 		echo $this->render($file, $renderer);
 		return $this;
 	}
-	
+
 	/**
 	 * Render sourc
 	 *
@@ -114,7 +114,7 @@ abstract class CommonParser
 		$this->elements->append($element);
 		return $this;
 	}
-	
+
 	/**
 	 * Clean line from TOKEN_INDENT
 	 *
@@ -222,7 +222,7 @@ abstract class CommonParser
 	{
 		if (!file_exists($file))
 			if (!file_exists($file = $this->getPath()."/$file"))
-				throw new CommonException("File '$file' don't exists");
+				throw new Exception("File '$file' don't exists");
 		$this->file = $file;
 		$this->setSource(file_get_contents($this->file));
 		return $this;
@@ -286,7 +286,7 @@ abstract class CommonParser
 		$this->renderer = $renderer;
 		return $this;
 	}
-	
+
 	const INDENT = 2;
 
 	const TOKEN_INDENT = ' ';
