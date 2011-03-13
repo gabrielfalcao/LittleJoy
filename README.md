@@ -103,6 +103,17 @@ documentation is quite a bit out-of-date, here is a small walk-through:
 
 **ATTENTION**: this walkthrough consider that you have [pear](http://pear.php.net) installed on your computer.
 
+### if you are running Mac OSX
+
+You may choose whether to use its builtin php or install a alternative [homebrew](http://github.com/mxcl/homebrew/) version found [here](brew install https://github.com/ampt/homebrew/raw/php/Library/Formula/php.rb)
+
+to do so:
+
+    brew install https://github.com/ampt/homebrew/raw/php/Library/Formula/php.rb --with-apache --with-mysql
+
+
+### afterwards
+
 1. Add a few channels on your pear
 2. Update your official channel
 3. Update your pear version
@@ -110,12 +121,12 @@ documentation is quite a bit out-of-date, here is a small walk-through:
 
 ### OK, here is the big command, just paste it in your terminal
 
-    sudo pear channel-discover pear.phpunit.de
-    sudo pear channel-discover pear.symfony-project.com
-    sudo pear channel-discover components.ez.no
-    sudo pear channel-update pear.php.net
-    sudo pear upgrade pear
-    sudo pear install --alldeps pear.phpunit.de/PHPUnit
+    pear channel-discover pear.phpunit.de
+    pear channel-discover pear.symfony-project.com
+    pear channel-discover components.ez.no
+    pear channel-update pear.php.net
+    pear upgrade pear
+    pear install --alldeps pear.phpunit.de/PHPUnit
 
 ## next steps
 
