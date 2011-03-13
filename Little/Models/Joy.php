@@ -201,9 +201,13 @@ class ModelJoy {
 
         return implode("\n", $parts);
     }
-    public static function syncdb($connection=null){
+    public static function syncdb($overwrite=false){
         $klass = get_called_class();
-        mysql_query($klass::as_table_string(), $connection ? $connection : Joy::get_current_mysql_connection());
+        $db_table = get_called_class();
+        if ($overwrite) {
+            Joy::query("DROP TABLE IF EXISTS `$db_table`;");
+        }
+        Joy::query($klass::as_table_string());
     }
 }
 

@@ -25,12 +25,24 @@ class TestModelJoy extends PHPUnit_Framework_TestCase {
     public function testPersonCreateTable() {
         $this->conn = Joy::connect_to_mysql_database("localhost", "root", null, "my_database");
         Person::syncdb();
-        mysql_query("INSERT INTO `Person` (`name`,`email`) VALUES('Gabriel', 'gabriel@nacaolivre.org');", $this->conn);
+        mysql_query("INSERT INTO `Person` (`name`,`email`) VALUES ('Gabriel', 'gabriel@nacaolivre.org');", $this->conn);
+        Person::syncdb(false);
         $res = mysql_query("SELECT * FROM Person;", $this->conn);
         $object = mysql_fetch_object($res);
         $this->assertEquals($object->name, "Gabriel");
         $this->assertEquals($object->email, "gabriel@nacaolivre.org");
     }
+
+    public function testPersonCreateTableForcesReset() {
+        $this->conn = Joy::connect_to_mysql_database("localhost", "root", null, "my_database");
+        Person::syncdb();
+        mysql_query("INSERT INTO `Person` (`name`,`email`) VALUES ('Gabriel', 'gabriel@nacaolivre.org');", $this->conn);
+        Person::syncdb(true);
+        $res = mysql_query("SELECT * FROM Person;", $this->conn);
+        $object = mysql_fetch_object($res);
+        $this->assertEquals($object, null);
+    }
+
     public function testPersonSave() {
         Joy::set_mysql_database("localhost", "root", null, "my_database");
         Joy::syncdb();

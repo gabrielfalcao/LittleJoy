@@ -95,6 +95,9 @@ class Joy {
         self::set_mysql_database($host, $user, $password, $database);
         return self::connect_to_registered_database();
     }
+    public static function query($SQL, $connection=null){
+        return mysql_query($SQL, $connection ? $connection : Joy::get_current_mysql_connection());
+    }
 
     public static function disconnect_from_registered_database(){
         mysql_close($GLOBALS["__little_joy_mysql_connection__"]);
