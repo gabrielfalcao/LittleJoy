@@ -144,8 +144,12 @@ class Joy {
 
     public static function syncdb() {
         $con = self::connect_to_registered_database();
+        $results = array();
         foreach (self::enjoy_models() as $model):
-            $model::syncdb();
+            array_push(
+                $results,
+                array("model" => $model, "success" => $model::syncdb())
+            );
         endforeach;
         self::disconnect_from_registered_database();
     }

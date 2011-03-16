@@ -26,6 +26,7 @@
 
 ***********************************************************************/
 import("Models/Fields");
+import("Models/Engine");
 
 /**
  * LittleJoy's base model,
@@ -78,20 +79,25 @@ class ModelJoy {
         }
     }
     public static function __callStatic($name, $arguments) {
-        $db_table = get_called_class();
+        $modelklass = get_called_class();
         $matches = array();
         if (preg_match("/^find_one_by_(.*)/", $name, $matches)){
-            $res = mysql_query("SELECT * FROM `$db_table` WHERE `{$matches[1]}` = '{$arguments[0]}'", Joy::get_current_mysql_connection());
-            if (!$res) {
-                return null;
-            }
-            return self::populated_with(mysql_fetch_assoc($res));
+            $mysql = new MySQLJoy($modelklass);
+
+            $field = $matches[1];
+            $value = $arguments[0];
+
+            return $mysql->find_one_by_($field, $value);
         } else {
             return parent::__callStatic($name, $arguments);
         }
     }
 
     public static function populated_with($data){
+        if (!is_array($data)) {
+            $type = gettype($data);
+            throw new Exception("$data should be a array, but is a $type");
+        }
         $klass = get_called_class();
         $object = new $klass();
         foreach ($data as $key => $value) {
@@ -207,7 +213,11 @@ class ModelJoy {
         if ($overwrite) {
             Joy::query("DROP TABLE IF EXISTS `$db_table`;");
         }
-        Joy::query($klass::as_table_string());
+        $results = array();
+        foreach (explode(";", $klass::as_table_string()) as $sql):
+            array_push($results, array($sql => Joy::query($sql)));
+        endforeach;
+        return $results;
     }
 }
 

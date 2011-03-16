@@ -26,29 +26,28 @@
 
 ***********************************************************************/
 
-import("Views/haml/HamlParser.class");
+define("NotFound", "NotFound");
+class NotFound extends Exception {}
 
-function render_view($name, $context=null, $basepath=null) {
-    if ($basepath && file_exists($basepath)) {
-        $viewdir = is_dir($basepath) ? $basepath : dirname($basepath);
-
-    } else {
-        $viewdir = $GLOBALS["__little_joy_views_dir__"];
+class MySQLJoy {
+    public function MySQLJoy ($model_class) {
+        $this->model = $model_class;
     }
-
-    $fullpath = $viewdir.DIRECTORY_SEPARATOR.trim($name, "/");
-
-    $parser = new HamlParser($viewdir);
-
-    if (is_array($context)) {
-        foreach ($context as $key => $value):
-            $parser->assign($key, $value);
-            endforeach;
+    public function sql_for_find_one_by_($field, $value) {
+        $klass = $this->model;
+        return "SELECT * FROM `{$klass}` WHERE `{$klass}`.`{$field}` = '{$value}'";
     }
+    public function find_one_by_($field, $value) {
+        $klass = $this->model;
+        $res = Joy::query($this->sql_for_find_one_by_($field, $value));
+        $found = mysql_fetch_assoc($res);
+        if (is_object($found)) {
+            return $klass::populated_with($found);
+        }
 
-    $parser->setTmp(sys_get_temp_dir());
-    $parser->setFile($fullpath);
-    $rendered = $parser->render();
-    $parser->clearCompiled();
-    return trim($rendered);
+        throw new NotFound("nothing found for \"SELECT * FROM `{$klass}` WHERE `{$field}` = '{$value}'\"");
+    }
 }
+
+?>
+

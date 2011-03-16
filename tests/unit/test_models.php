@@ -78,7 +78,11 @@ class TestModelJoy extends PHPUnit_Framework_TestCase {
         $one = Foo::populated_with(array("bar" => "TDD", "baz" => "rockz", "ID" => 987));
         $this->assertEquals($one->prepare_update(), "UPDATE `Foo` SET `bar` = 'TDD', `baz` = 'rockz' WHERE ID = 987;");
     }
-
+    public function testComparation(){
+        $one = Foo::populated_with(array("bar" => "TDD", "baz" => "rockz"));
+        $two = Foo::populated_with(array("bar" => "TDD", "baz" => "rockz"));
+        $this->assertEquals($one, $two);
+    }
 }
 
 ?>
