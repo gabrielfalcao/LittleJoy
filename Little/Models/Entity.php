@@ -43,16 +43,23 @@ class SQLManager {
             "CREATE TABLE `{$this->entity->table->name}` (",
             "  `id` int(11) NOT NULL AUTO_INCREMENT,",
         );
+        $unique_fields = array();
         foreach ($this->entity->get_fields() as $fieldname => $field) {
             if (is_subclass_of($field, "Field")) {
                 $sql_list []= $field->as_sql();
+                if ($field->unique) {
+                    $unique_fields []= $fieldname;
+                }
             } else {
                 throw new Exception("{$this->entity}->{$fieldname} is supposed to be a field");
             }
         }
 
         $sql_list []= "  PRIMARY KEY (`id`),";
-        $sql_list []= "  UNIQUE KEY `username` (`username`)";
+        foreach ($unique_fields as $fieldname) {
+            $sql_list []= "  UNIQUE KEY `{$fieldname}` (`{$fieldname}`)";
+        }
+
         $sql_list []= ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
         return implode("\n", $sql_list);
     }
@@ -126,7 +133,7 @@ class TableMetadata {
         $this->name = $name;
     }
     public function name_is($name) {
-        $this->$name = $name;
+        $this->name = $name;
         return $this;
     }
 }
