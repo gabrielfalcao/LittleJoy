@@ -1,5 +1,7 @@
 # LittleJoy
 
+> version 0.1 - unreleased
+
 Really tiny php framework focused on easy-to-write and easy-to-run tests through [phpunit](http://phpunit.de)
 
 # hands on
@@ -20,19 +22,13 @@ Simple example, just put the code below in your `index.php` file, in Apache's Do
     <?php
     require_once "Little/Joy.php";
 
-    class Main extends ControllerJoy {
-        var $urls = array(
-            '^' => 'index',
-            '^hello' => 'hello_world'
-
-        );
-        public function index($response, $matches, $route) {
+    get("/", function ($response, $matches, $route){
             return '<h1>Index</h1>';
-        }
-        public function hello_world($response, $matches, $route) {
-            return '<h1>Hello World</h1>';
-        }
-    }
+        });
+
+    get("/hello", function ($response, $matches, $route){
+            return render_view("hello-world.haml", array("name", $_GET["username"]));
+        });
 
     Joy::and_work();
     ?>
@@ -58,23 +54,31 @@ so if you already worked with Django, it will not be a problem.
 
     require_once "Little/Joy.php";
 
-    class School extends ModelJoy {
-        var $name = array(type => CharField, max_length => 100);
-        var $website = array(type => URLField);
-    }
+    Entity("User", function($does, $validate, $table){
+            $does->have("username", new CharField(30));
+            $does->have("first_name", new CharField(30));
+            $does->have("last_name", new CharField(30));
+            $does->have("email", new EmailField());
+            $does->have("password", new CharField(128));
+            $does->have("is_staff", new BooleanField());
+            $does->have("is_active", new BooleanField());
+            $does->have("is_superuser", new BooleanField());
+            $does->have("last_login", new DateTimeField());
+            $does->have("date_joined", new DateTimeField());
 
-    class Person extends ModelJoy {
-        var $name = array(type => CharField, max_length => 100);
-        var $email = array(type => EmailField);
-        var $bio = array(type => TextField);
-        var $website = array(type => URLField);
-        var $gender = array(type => ChoiceField, nullable => true, choices => array("male", "female"));
-        var $birthday = array(type => DateTimeField, nullable => true);
+            $does->has_many("groups")->from_entity("Group")->through("auth_user_groups");
 
-        var $mother = array(type => ForeignKey, related_with => "Person");
-        var $father = array(type => ForeignKey, related_with => "Person");
-        var $school = array(type => ForeignKey, related_with => "School");
-    }
+            $does->validate_uniqueness_of("username");
+
+            $table->name_is("auth_user");
+            $does->extend("UserModelBusinessRules");
+        });
+
+    Entity("Group", function($does, $validate, $table){
+            $does->have("name", new CharField(80));
+            $does->has_many("users")->from_entity("User")->through("auth_user_groups");
+            $table->name_is("auth_group");
+        });
 
 
 ### Create all declared Models as tables in the database
