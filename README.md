@@ -63,7 +63,7 @@ so if you already worked with Django, it will not be a problem.
             $does->have("is_staff", new BooleanField());
             $does->have("is_active", new BooleanField());
             $does->have("is_superuser", new BooleanField());
-            $does->have("last_login", new DateTimeField());
+            $does->have("last_login", new DateTimeField(true));
             $does->have("date_joined", new DateTimeField());
 
             $does->has_many("groups")->from_entity("Group")->through("auth_user_groups");
@@ -81,22 +81,57 @@ so if you already worked with Django, it will not be a problem.
         });
 
 
+    // extend your entity model here
+    class UserModelBusinessRules {
+        public function get_full_name(){
+            return $this->first_name . " " . $this->last_name;
+        }
+        public function hash($password) {
+            $sha = sha1($this->username.$password);
+            return "sha1:{$sha}";
+        }
+        public function set_password($new) {
+            if (!is_null($this->password) && ($this->password != $this->hash($new))) {
+                throw new Exception("Old password does not match");
+            }
+            $this->password = $this->hash($new);
+        }
+    }
+
 ### Create all declared Models as tables in the database
 
     Joy::syncdb();
 
 ### Now you can play with it
 
-    $school = School::populated_with(array("name" => "Harvard School of Engineer and Applied Sciences", "website" => "http://seas.harvard.edu/"));
-    $school->save(); //performs a INSERT
+    $john = new User();
+    $john->username = "johndoe";
+    $john->first_name = "John";
+    $john->last_name = "Doe";
+    $john->email = "john@doe.com";
+    $john->set_password("123456");
+    $john->date_joined = time();
+    $john->save(); //performs a UPDATE
 
-    $school->website = http://new-website.url";
-    $school->save(); //performs a UPDATE
+    $found_by_username = User::find_one_by_username("johndoe");
+    $found_by_email = User::find_one_by_email("john@doe.com");
 
-    $found_by_name = School::find_one_by_name("Harvard School of Engineer and Applied Sciences");
-    $found_by_website = School::find_one_by_website("http://new-website.url");
+    $found_by_website->name === $found_by_name->name === $user->name;
 
-    $found_by_website->name === $found_by_name->name === $school->name;
+
+#### relationships
+
+    $admins = new Group();
+    $admins->name "Administrators";
+    $john->groups->add($john);
+    $john->save();
+
+    $groups1 = $john->groups->all();
+    $groups2 = $john->groups->by_name("Administrators");
+
+    $single_group = $john->groups->by_name("Administrators")->first();
+
+    $admins == $groups1[0] == $groups[1] == $single_group;
 
 # Contributing
 
