@@ -52,6 +52,7 @@
  *  @param string $path The unix-like path
  *  @param bool $absolute_to_joy if the import should be prepended by the absolute path to LittleJoy's root dir. Defaults to true
  */
+$GLOBALS["__little_joy_config__"] = array();
 
 function import($path, $absolute_to=__FILE__) {
     $parts = explode("/", $path);
@@ -78,8 +79,6 @@ class CouldNotConnectToDatabase extends Exception {}
 define("CouldNotConnectToDatabase", "CouldNotConnectToDatabase");
 class NoDatabaseRegistered extends Exception {}
 define("NoDatabaseRegistered", "NoDatabaseRegistered");
-
-$GLOBALS["__little_joy_config__"] = array();
 
 class Joy {
     public static function version (){
@@ -187,6 +186,18 @@ class Joy {
     public static function set($key, $value){
         $GLOBALS["__little_joy_config__"][$key] = $value;
         return $GLOBALS["__little_joy_config__"];
+    }
+    public static function array_get($haystack, $needle, $fallback=null){
+        if (count($haystack) == 0) {
+            return $fallback;
+        }
+        if (is_null($haystack)) {
+            return $fallback;
+        }
+        if (array_key_exists($needle, $haystack)) {
+            return $haystack[$needle];
+        }
+        return $fallback;
     }
     public static function debug_as_json($json)
     {

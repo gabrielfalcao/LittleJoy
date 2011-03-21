@@ -1,11 +1,13 @@
 <?php
 require_once("Little/Joy.php");
 
-class User1 extends ModelJoy {
-    var $name = array(type => CharField, max_length => 100);
-    var $password = array(type => CharField, max_length => 100);
-    var $email = array(type => EmailField);
-}
+Entity("User1", function($does, $validate, $table){
+        $does->have("name", new CharField(30));
+        $does->have("password", new CharField(128));
+        $does->have("email", new EmailField());
+
+        $table->name_is("tests_functional_test_joy_user");
+    });
 
 class TestJoy extends PHPUnit_Framework_TestCase {
     public function setUp(){
@@ -33,7 +35,7 @@ class TestJoy extends PHPUnit_Framework_TestCase {
         Joy::syncdb();
 
         $this->conn = Joy::connect_to_registered_database();
-        mysql_query("INSERT INTO `User1` (`ID`,`name`,`email`,`password`) VALUES( 1, 'Gabriel', 'gabriel@nacaolivre.org', '123456');", $this->conn);
+        mysql_query("INSERT INTO `tests_functional_test_joy_user` (`ID`,`name`,`email`,`password`) VALUES( 1, 'Gabriel', 'gabriel@nacaolivre.org', '123456');", $this->conn);
         $res = mysql_query("SELECT * FROM User1;", $this->conn);
         $object = mysql_fetch_object($res);
         $this->assertEquals($object->name, "Gabriel");

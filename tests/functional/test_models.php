@@ -1,4 +1,5 @@
 <?php
+/*
 require_once("Little/Joy.php");
 
 class Person extends ModelJoy {
@@ -121,5 +122,5 @@ class TestModelJoy extends PHPUnit_Framework_TestCase {
     }
 
 }
-
+*/
 ?>
