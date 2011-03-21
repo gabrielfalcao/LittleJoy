@@ -132,24 +132,22 @@ class Joy {
     }
     public static function enjoy_models(){
         $models = array();
-        foreach (get_declared_classes() as $klass):
-            $parent = get_parent_class($klass);
-            if ($parent == "ModelJoy") {
-                array_push($models, $klass);
-            }
-        endforeach;
+        foreach ($GLOBALS["__little_joy_entities__"] as $klass => $declaration){
+            $models[$klass]= $declaration;
+        }
         return $models;
     }
 
     public static function syncdb() {
         $con = self::connect_to_registered_database();
         $results = array();
-        foreach (self::enjoy_models() as $model):
-            array_push(
-                $results,
-                array("model" => $model, "success" => $model::syncdb())
+        foreach (self::enjoy_models() as $entity => $declaration) {
+            $results[]= array(
+                "entity" => $entity,
+                "declaration" => $declaration,
+                "success" => $entity::syncdb()
             );
-        endforeach;
+        }
         self::disconnect_from_registered_database();
     }
     private static function _store_work_params($params){

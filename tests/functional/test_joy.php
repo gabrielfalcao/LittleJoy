@@ -36,7 +36,7 @@ class TestJoy extends PHPUnit_Framework_TestCase {
 
         $this->conn = Joy::connect_to_registered_database();
         mysql_query("INSERT INTO `tests_functional_test_joy_user` (`ID`,`name`,`email`,`password`) VALUES( 1, 'Gabriel', 'gabriel@nacaolivre.org', '123456');", $this->conn);
-        $res = mysql_query("SELECT * FROM User1;", $this->conn);
+        $res = mysql_query("SELECT * FROM tests_functional_test_joy_user;", $this->conn);
         $object = mysql_fetch_object($res);
         $this->assertEquals($object->name, "Gabriel");
         $this->assertEquals($object->email, "gabriel@nacaolivre.org");

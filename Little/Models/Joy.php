@@ -42,25 +42,4 @@ define("table_name", "table_name");
  * @version 0.1
  * @package LittleJoy
  */
-
-class ModelJoy {
-    public function save(){
-        $klass = get_called_class();
-        Joy::query($klass::sql_for(insert, $this));
-        $this->ID = mysql_insert_id($this->connection);
-    }
-    public static function syncdb($overwrite=false){
-        $klass = get_called_class();
-        $db_table = $klass::meta(table_name);
-        if ($overwrite) {
-            Joy::query("DROP TABLE IF EXISTS `$db_table`;");
-        }
-        $results = array();
-        foreach (explode(";", $klass::as_table_string()) as $sql):
-            array_push($results, array($sql => Joy::query($sql)));
-        endforeach;
-        return $results;
-    }
-}
-
 ?>

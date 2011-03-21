@@ -39,8 +39,10 @@ class SQLManager {
         $this->entity = $entity;
     }
     public function create (){
+        $klass = $this->entity->class;
+        $table_name = $klass::meta(table_name);
         $sql_list = array(
-            "CREATE TABLE `{$this->entity->table->name}` (",
+            "CREATE TABLE `{$table_name}` (",
             "  `id` int(11) NOT NULL AUTO_INCREMENT,",
         );
         $unique_fields = array();
@@ -163,6 +165,25 @@ class BaseEntity {
         $sql = new SQLManager($klass::__get_declaration());
         return $sql->$what();
     }
+    public static function syncdb($overwrite=false){
+        $klass = get_called_class();
+
+        $db_table = $klass::meta(table_name);
+        if ($overwrite) {
+            Joy::query("DROP TABLE IF EXISTS `$db_table`;");
+        }
+        $results = array();
+        foreach (explode(";", $klass::sql_for(create)) as $sql):
+            array_push($results, array($sql => Joy::query($sql)));
+        endforeach;
+        return $results;
+    }
+    public function save(){
+        $klass = get_called_class();
+        Joy::query($klass::sql_for(insert, $this));
+        $this->ID = mysql_insert_id($this->connection);
+    }
+
 }
 function Entity($klass, $creation_callback){
     $name = "$klass";
