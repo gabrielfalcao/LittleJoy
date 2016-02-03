@@ -17,25 +17,27 @@ and start hacking!
 
 Simple example, just put the code below in your `index.php` file, in Apache's DocRoot:
 
-    <?php
-    require_once "Little/Joy.php";
+```php
+<?php
+require_once "Little/Joy.php";
 
-    class Main extends ControllerJoy {
-        var $urls = array(
-            '^' => 'index',
-            '^hello' => 'hello_world'
+class Main extends ControllerJoy {
+    var $urls = array(
+        '^' => 'index',
+        '^hello' => 'hello_world'
 
-        );
-        public function index($response, $matches, $route) {
-            return '<h1>Index</h1>';
-        }
-        public function hello_world($response, $matches, $route) {
-            return '<h1>Hello World</h1>';
-        }
+    );
+    public function index($response, $matches, $route) {
+        return '<h1>Index</h1>';
     }
+    public function hello_world($response, $matches, $route) {
+        return '<h1>Hello World</h1>';
+    }
+}
 
-    Joy::and_work();
-    ?>
+Joy::and_work();
+?>
+```
 
 ### note on nice urls
 
