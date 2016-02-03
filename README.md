@@ -44,11 +44,13 @@ Joy::and_work();
 You need [mod_rewrite](http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html) working in your apache
 and the following rewrite configuration:
 
-    RewriteEngine On
-    RewriteBase /
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . /index.php [L]
+```apache
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+```
 
 ## Active Record
 
@@ -58,25 +60,27 @@ so if you already worked with Django, it will not be a problem.
 
 ### Declare your models sweetly
 
-    require_once "Little/Joy.php";
+```php
+require_once "Little/Joy.php";
 
-    class School extends ModelJoy {
-        var $name = array(type => CharField, max_length => 100);
-        var $website = array(type => URLField);
-    }
+class School extends ModelJoy {
+    var $name = array(type => CharField, max_length => 100);
+    var $website = array(type => URLField);
+}
 
-    class Person extends ModelJoy {
-        var $name = array(type => CharField, max_length => 100);
-        var $email = array(type => EmailField);
-        var $bio = array(type => TextField);
-        var $website = array(type => URLField);
-        var $gender = array(type => ChoiceField, nullable => true, choices => array("male", "female"));
-        var $birthday = array(type => DateTimeField, nullable => true);
+class Person extends ModelJoy {
+    var $name = array(type => CharField, max_length => 100);
+    var $email = array(type => EmailField);
+    var $bio = array(type => TextField);
+    var $website = array(type => URLField);
+    var $gender = array(type => ChoiceField, nullable => true, choices => array("male", "female"));
+    var $birthday = array(type => DateTimeField, nullable => true);
 
-        var $mother = array(type => ForeignKey, related_with => "Person");
-        var $father = array(type => ForeignKey, related_with => "Person");
-        var $school = array(type => ForeignKey, related_with => "School");
-    }
+    var $mother = array(type => ForeignKey, related_with => "Person");
+    var $father = array(type => ForeignKey, related_with => "Person");
+    var $school = array(type => ForeignKey, related_with => "School");
+}
+```
 
 
 ### Create all declared Models as tables in the database
