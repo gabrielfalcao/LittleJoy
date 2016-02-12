@@ -145,3 +145,7 @@ to do so:
 ### 4. hack at will
 ### 5. commit, push etc
 ### 6. send a pull request
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/gabrielfalcao/littlejoy/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
